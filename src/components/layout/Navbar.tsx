@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-
 import { Menu, X, MessageCircle } from "lucide-react";
 import { Logo } from "@/components/logo/Logo";
 import { Button } from "@/components/ui/Button";
-import { SITE, waLink } from "@/lib/utils";
+import { SITE, waLink, cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "#services", label: "Services" },
@@ -29,7 +29,10 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <header
+    <motion.header
+      initial={{ y: -32, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled ? "py-3" : "py-5"
       }`}
@@ -40,23 +43,57 @@ export function Navbar() {
             scrolled ? "glass-panel shadow-lg shadow-black/20" : "bg-transparent"
           }`}
         >
-          <a href="#top" className="shrink-0">
-            <Logo size={26} />
-          </a>
+          <motion.a
+            href="#top"
+            className="shrink-0"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ scale: 1.04 }}
+          >
+            <Logo size={26} tone={scrolled ? "light" : "dark"} />
+          </motion.a>
 
-          <nav className="hidden items-center gap-8 lg:flex">
+          <motion.nav
+            className="hidden items-center gap-8 lg:flex"
+            initial="hidden"
+            animate="show"
+            variants={{ show: { transition: { staggerChildren: 0.07, delayChildren: 0.25 } } }}
+          >
             {LINKS.map((l) => (
-              <a
+              <motion.a
                 key={l.href}
                 href={l.href}
-                className="text-sm font-medium text-white/75 transition-colors hover:text-white"
+                variants={{
+                  hidden: { opacity: 0, y: -10 },
+                  show: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                  "relative text-sm font-medium transition-colors",
+                  scrolled ? "text-white/75 hover:text-white" : "text-ink/70 hover:text-ink"
+                )}
               >
                 {l.label}
-              </a>
+              </motion.a>
             ))}
-          </nav>
+          </motion.nav>
 
-          <div className="hidden lg:block">
+          <motion.div
+            className="hidden items-center gap-5 lg:flex"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <a
+              href="#rates"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                scrolled ? "text-white/75 hover:text-white" : "text-ink/70 hover:text-ink"
+              )}
+            >
+              Rates
+            </a>
             <Button
               href={waLink(SITE.whatsappPrimary, "Hi WID PAI Exchange, I'd like to make an exchange.")}
               variant="whatsapp"
@@ -65,15 +102,21 @@ export function Navbar() {
             >
               Send a Chat
             </Button>
-          </div>
+          </motion.div>
 
-          <button
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-white lg:hidden"
+          <motion.button
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className={cn(
+              "grid h-10 w-10 place-items-center rounded-full border lg:hidden",
+              scrolled ? "border-white/15 text-white" : "border-ink/15 text-ink"
+            )}
             onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -120,6 +163,6 @@ export function Navbar() {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </motion.header>
   );
 }

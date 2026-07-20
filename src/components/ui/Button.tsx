@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 type ButtonProps = {
   href: string;
   children: ReactNode;
-  variant?: "primary" | "ghost" | "whatsapp";
+  variant?: "primary" | "ghost" | "whatsapp" | "outline";
   size?: "md" | "lg";
   className?: string;
   icon?: ReactNode;
@@ -36,6 +36,8 @@ export function Button({
       "border border-white/20 bg-white/5 text-white backdrop-blur hover:border-white/40 hover:bg-white/10",
     whatsapp:
       "bg-gradient-to-r from-[#25D366] to-[#1fb855] text-ink shadow-[0_8px_30px_-8px_rgba(37,211,102,0.65)] hover:shadow-[0_12px_40px_-6px_rgba(37,211,102,0.85)] hover:-translate-y-0.5",
+    outline:
+      "border border-ink/15 bg-white text-ink shadow-[0_8px_24px_-12px_rgba(15,8,25,0.35)] hover:border-ink/25 hover:bg-cream-soft",
   };
 
   return (

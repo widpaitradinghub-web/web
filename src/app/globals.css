@@ -10,6 +10,10 @@
   --color-ink-soft: #170d29;
   --color-ink-elevated: #1e1234;
 
+  /* Light hero surface, for sections that sit on a bright backdrop */
+  --color-cream: #f4f1ec;
+  --color-cream-soft: #ebe6dd;
+
   --color-brand-50: #f6f2ff;
   --color-brand-100: #ede4ff;
   --color-brand-200: #d9c7ff;
