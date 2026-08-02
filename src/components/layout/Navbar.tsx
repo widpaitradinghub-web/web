@@ -109,7 +109,7 @@ export function Navbar() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
             className={cn(
-              "grid h-10 w-10 place-items-center rounded-full border lg:hidden",
+              "relative z-50 grid h-10 w-10 place-items-center rounded-full border lg:hidden",
               scrolled ? "border-white/15 text-white" : "border-ink/15 text-ink"
             )}
             onClick={() => setOpen((v) => !v)}

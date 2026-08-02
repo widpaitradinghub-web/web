@@ -93,6 +93,7 @@ function PhoneMock() {
   const [usdKes, setUsdKes] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(0);
   const [typing, setTyping] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const startedRef = useRef(false);
   const rateRef = useRef<number | null>(null);
 
@@ -119,20 +120,40 @@ function PhoneMock() {
   useEffect(() => {
     if (!phoneRef.current) return;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let cancelled = false;
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-    const play = async () => {
+    const playOnce = async () => {
       const script = buildScript(rateRef.current);
-      const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-      if (reduceMotion) {
-        setVisibleCount(script.length);
-        return;
-      }
       for (let i = 0; i < script.length; i++) {
+        if (cancelled) return;
         setTyping(true);
         await wait(650 + Math.random() * 400);
+        if (cancelled) return;
         setTyping(false);
         setVisibleCount((c) => c + 1);
         await wait(450);
+      }
+    };
+
+    // Loop the conversation continuously so the demo always has something
+    // happening — pause on the finished state, fade out, then replay.
+    const loop = async () => {
+      if (reduceMotion) {
+        setVisibleCount(buildScript(rateRef.current).length);
+        return;
+      }
+      while (!cancelled) {
+        await playOnce();
+        await wait(2600);
+        if (cancelled) return;
+        setResetting(true);
+        await wait(400);
+        if (cancelled) return;
+        setTyping(false);
+        setVisibleCount(0);
+        setResetting(false);
+        await wait(350);
       }
     };
 
@@ -142,11 +163,14 @@ function PhoneMock() {
       onEnter: () => {
         if (startedRef.current) return;
         startedRef.current = true;
-        play();
+        loop();
       },
     });
 
-    return () => st.kill();
+    return () => {
+      cancelled = true;
+      st.kill();
+    };
   }, []);
 
   const script = buildScript(usdKes);
@@ -168,7 +192,10 @@ function PhoneMock() {
           </div>
 
           <div
-            className="flex flex-1 flex-col justify-end gap-2 overflow-hidden px-3 py-4"
+            className={cn(
+              "flex flex-1 flex-col justify-end gap-2 overflow-hidden px-3 py-4 transition-opacity duration-400",
+              resetting ? "opacity-0" : "opacity-100"
+            )}
             style={{
               backgroundImage:
                 "radial-gradient(circle at 20% 15%, rgba(255,255,255,0.03) 0, transparent 40%), radial-gradient(circle at 85% 75%, rgba(255,255,255,0.03) 0, transparent 40%)",
@@ -246,23 +273,6 @@ export function Services() {
         }
       );
 
-      gsap.fromTo(
-        heroRef.current,
-        { autoAlpha: 0, y: 60, scale: 0.94 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "top 55%",
-            scrub: 0.6,
-          },
-        }
-      );
-
       if (cards.length) {
         gsap.fromTo(
           cards,
@@ -281,6 +291,28 @@ export function Services() {
           }
         );
       }
+
+      // A single timeline drives the phone/cards through their whole life
+      // on screen — fade+scale in, hold, then sink/shrink/fade away as the
+      // next section's curtain rises over them. Using one timeline (instead
+      // of two separate scrubbed tweens on the same properties) avoids the
+      // two ScrollTriggers fighting over autoAlpha/y/scale, which caused a
+      // hard snap instead of a smooth cross-fade.
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.6,
+        },
+      })
+        .fromTo(
+          heroRef.current,
+          { autoAlpha: 0, y: 60, scale: 0.94 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.25, ease: "none" }
+        )
+        .to(heroRef.current, { duration: 0.4 })
+        .to(heroRef.current, { autoAlpha: 0, y: 220, scale: 0.85, duration: 0.35, ease: "none" });
     }, sectionRef);
 
     return () => ctx.revert();

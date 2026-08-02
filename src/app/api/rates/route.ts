@@ -31,13 +31,16 @@ function trendFor(key: string, value: number): "up" | "down" {
   return trend;
 }
 
+function fetchWithTimeout(url: string, ms = 6000) {
+  return fetch(url, { cache: "no-store", signal: AbortSignal.timeout(ms) });
+}
+
 export async function GET() {
   try {
     const [fxRes, cryptoRes] = await Promise.all([
-      fetch("https://open.er-api.com/v6/latest/USD", { next: { revalidate: 60 } }),
-      fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd",
-        { next: { revalidate: 60 } }
+      fetchWithTimeout("https://open.er-api.com/v6/latest/USD"),
+      fetchWithTimeout(
+        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd"
       ),
     ]);
 
