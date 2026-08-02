@@ -5,13 +5,18 @@ type LogoProps = {
   className?: string;
   size?: number;
   variant?: "full" | "mark";
-  tone?: "light" | "dark" | "purple" | "black";
+  /**
+   * - "light" / "white": White logo (for dark or purple backgrounds)
+   * - "purple" / "dark": Brand purple logo (for white or light backgrounds)
+   * - "black": Solid black logo (for white or light backgrounds)
+   */
+  tone?: "light" | "white" | "dark" | "purple" | "black";
   priority?: boolean;
 };
 
 /**
  * Official WID PAI Exchange brand logo component.
- * Uses high-resolution transparent vector-cut PNG assets extracted from official brand graphics.
+ * Uses high-resolution transparent PNG assets extracted from official brand graphics.
  */
 export function Logo({
   className,
@@ -20,7 +25,7 @@ export function Logo({
   tone = "light",
   priority = true,
 }: LogoProps) {
-  // Select appropriate logo file based on tone and variant
+  // Select appropriate logo asset based on background tone requirements
   let logoSrc = "/images/logo/logo-white.png";
   
   if (variant === "mark") {
@@ -34,6 +39,7 @@ export function Logo({
       case "black":
         logoSrc = "/images/logo/logo-black.png";
         break;
+      case "white":
       case "light":
       default:
         logoSrc = "/images/logo/logo-white.png";
