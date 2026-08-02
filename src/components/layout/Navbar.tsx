@@ -51,7 +51,7 @@ export function Navbar() {
             transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             whileHover={{ scale: 1.04 }}
           >
-            <Logo size={26} tone={scrolled ? "light" : "dark"} />
+            <Logo size={32} tone="light" />
           </motion.a>
 
           <motion.nav

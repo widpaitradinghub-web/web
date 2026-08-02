@@ -17,7 +17,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-16">
         <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <Logo size={30} />
+            <Logo size={36} tone="light" />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/55">
               Your safe and fast solution to all your foreign exchange needs — trusted for
               currency and crypto exchange across Kenya and beyond.

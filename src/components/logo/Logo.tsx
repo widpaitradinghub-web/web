@@ -1,44 +1,63 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Leaf } from "./Leaf";
 
 type LogoProps = {
   className?: string;
   size?: number;
   variant?: "full" | "mark";
-  tone?: "light" | "dark";
+  tone?: "light" | "dark" | "purple" | "black";
+  priority?: boolean;
 };
 
 /**
- * WID PAI wordmark: "W" + leaf glyph standing in for the crossbar + "D",
- * with the PAI superscript and tracked EXCHANGE lockup underneath.
- * Built from live text (not a raster) so it stays sharp at any size and
- * inherits currentColor for theming.
+ * Official WID PAI Exchange brand logo component.
+ * Uses high-resolution transparent vector-cut PNG assets extracted from official brand graphics.
  */
-export function Logo({ className, size = 40, variant = "full", tone = "light" }: LogoProps) {
-  const ink = tone === "light" ? "text-white" : "text-ink";
-  const accent = tone === "light" ? "text-brand-300" : "text-brand-600";
-  const sub = tone === "light" ? "text-white/70" : "text-ink/60";
+export function Logo({
+  className,
+  size = 36,
+  variant = "full",
+  tone = "light",
+  priority = true,
+}: LogoProps) {
+  // Select appropriate logo file based on tone and variant
+  let logoSrc = "/images/logo/logo-white.png";
+  
+  if (variant === "mark") {
+    logoSrc = "/images/logo/logo-mark.png";
+  } else {
+    switch (tone) {
+      case "dark":
+      case "purple":
+        logoSrc = "/images/logo/logo-purple.png";
+        break;
+      case "black":
+        logoSrc = "/images/logo/logo-black.png";
+        break;
+      case "light":
+      default:
+        logoSrc = "/images/logo/logo-white.png";
+        break;
+    }
+  }
+
+  // Aspect ratio is ~3.1 for full logo, ~0.4 for mark icon
+  const aspectRatio = variant === "mark" ? 0.41 : 3.1;
+  const height = size;
+  const width = Math.round(height * aspectRatio);
 
   return (
-    <div
-      style={{ fontSize: size }}
-      className={cn("inline-flex flex-col select-none leading-none font-display", className)}
-    >
-      <div className="flex items-center">
-        <span className={cn("font-extrabold tracking-tight", ink)}>W</span>
-        <Leaf size={undefined} className={cn("h-[0.62em] w-[0.62em] -mx-[0.06em] translate-y-[0.02em]", accent)} />
-        <span className={cn("font-extrabold tracking-tight", ink)}>D</span>
-        {variant === "full" && (
-          <span className={cn("ml-[0.08em] self-start text-[0.32em] font-bold tracking-wide mt-[0.05em]", accent)}>
-            PAI
-          </span>
-        )}
-      </div>
-      {variant === "full" && (
-        <span className={cn("mt-[0.16em] text-[0.19em] font-semibold uppercase tracking-[0.5em]", sub)}>
-          Exchange
-        </span>
-      )}
+    <div className={cn("inline-flex items-center shrink-0 select-none", className)}>
+      <Image
+        src={logoSrc}
+        alt="WID PAI Exchange Logo"
+        width={width * 2} // HiDPI double density
+        height={height * 2}
+        priority={priority}
+        className="h-auto w-auto object-contain transition-opacity duration-200"
+        style={{ height: `${height}px`, width: "auto" }}
+      />
     </div>
   );
 }
+
